@@ -5,46 +5,17 @@ const wrapAsync = require("../utils/wrapAsync.js")
 const passport = require("passport")
 const { saveRedirectUrl } = require("../middleware.js")
 
-router.get("/signup", (req, res) => {
-    res.render("users/signup.ejs") // Render the signup page
-})
+const usersController = require("../controllers/users.js")
+const user = require("../models/user.js")
 
-router.post("/signup", wrapAsync(async (req, res) => {
-    try {
-        let { username, email, password } = req.body
-        const newUser = new User({ username, email })
-        const registeredUser = await User.register(newUser, password)
-        console.log(registeredUser)
-        req.login(registeredUser, (err) => {
-            if (err) {
-                return next(err)
-            }
-            req.flash("success", "Welcome to Wanderlust!")
-            res.redirect("/listings") // Redirect to listings after signup
-        })
-    } catch (e) {
-        req.flash("error", e.message)
-        res.redirect("/signup")
-    }
-}))
+router.route("/signup")
+.get(wrapAsync(usersController.signupForm)) // Routes for user authentication
+.post(wrapAsync(usersController.signup)) // Handle user signup
 
-router.get("/login", (req, res) => {
-    res.render("users/login.ejs") // Render the login page
-})
+router.route("/login")
+.get(wrapAsync(usersController.loginForm)) // Render the login form
+.post(saveRedirectUrl, passport.authenticate("local", { successRedirect: "/listings", failureRedirect: "/login", failureFlash: true}), usersController.login) // Handle user login
 
-router.post("/login", saveRedirectUrl, passport.authenticate("local", { successRedirect: "/listings", failureRedirect: "/login", failureFlash: true}), async (req, res) => {
-    req.flash("success", "Welcome back to Wanderlust!")
-    res.redirect(req.locals.redirectUrl || "/listings") // Redirect to listings after login
-})
-
-router.get("/logout", (req, res) => {
-    req.logout((err) => {
-        if (err) {
-            return next(err)
-        }
-        req.flash("success", "Logged out successfully!")
-        res.redirect("/listings") // Redirect to listings after logout
-    })
-})
+router.get("/logout", usersController.logout)
 
 module.exports = router

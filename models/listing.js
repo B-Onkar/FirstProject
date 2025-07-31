@@ -9,9 +9,8 @@ const ListingSchema = new Schema({
     },
     description: String,
     image: {
-        type: String,
-        default: "https://unsplash.com/photos/a-living-room-filled-with-furniture-and-a-flat-screen-tv-JhkY1M6HN9Y",
-        set: (v) => v === "" ? "https://unsplash.com/photos/a-living-room-filled-with-furniture-and-a-flat-screen-tv-JhkY1M6HN9Y" : v
+        url: String,
+        filename: String
     },
     price: Number,
     location: String,
