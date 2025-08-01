@@ -43,13 +43,23 @@ module.exports.editListingForm = async (req, res) => {
         req.flash("error", "Listing not found!")
         return res.redirect("/listings")
     }
-    return res.render("listings/edit.ejs", {listing})
+
+    let originalImageUrl = listing.image.url
+    originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250")
+    return res.render("listings/edit.ejs", {listing, originalImageUrl})
 }
 
 // Update Route
 module.exports.updateListing = async (req, res) => {
     let {id} = req.params
-    await Listing.findByIdAndUpdate(id, {...req.body.listing})
+    let listing = await Listing.findByIdAndUpdate(id, {...req.body.listing})
+
+    if (typeof req.file !== 'undefined') {
+        let url = req.file.path
+        let filename = req.file.filename
+        listing.image = { url, filename } // Update the image URL and filename
+        await listing.save()
+    }
     req.flash("success", "Successfully updated listing!")
     return res.redirect(`/listings/${id}`)
 }
