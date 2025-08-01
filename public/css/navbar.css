@@ -1,0 +1,15 @@
+.search-btn {
+background-color: #fe424d;
+color: white;
+border-radius: 50%;
+}
+.search-btn:hover {
+background-color: #fe424d;
+color: white;
+}
+
+.search-inp {
+border-radius: 25px;
+padding: 0.5rem 3rem 0.5rem 3rem;
+font-size: 1rem;
+}
